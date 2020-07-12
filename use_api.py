@@ -12,7 +12,7 @@ def start_the_program():
     print()
 
     while not test_result.exit_code:
-        while test_result.check_update_flag or test_result.exit_code:
+        while test_result.check_update_flag and (not test_result.exit_code):
             r = test_result.request_data()
             time.sleep(0.3)
 
@@ -31,6 +31,9 @@ def start_the_program():
 
         test_result.status_check(workbook)
         time.sleep(2)
+
+    # workbook.close()
+    print("Exiting Program...")
 
 
 if __name__ == '__main__':

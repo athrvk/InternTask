@@ -1,6 +1,5 @@
 import requests
 import datetime
-import openpyxl as px
 import xlwings as xl
 import json
 import pandas as pd
@@ -20,16 +19,25 @@ class intern_test:
 
     def request_data(self):
         # print(self.url)
-        requested_data = requests.get(self.url.format(self.city_name, self.unit_system, self.api_key))
+        try:
+            requested_data = requests.get(self.url.format(self.city_name, self.unit_system, self.api_key))
+        except:
+            print(requested_data, "\n Cannot Request Data...\n")
+            exit()
         print("Data request complete...")
         return requested_data.json()
 
     def create_xlfile(self, filename='test.xlsx'):
         xl.Interactive = True
         xl.Visible = True
-        workbook = xl.Book()
-        workbook.activate(steal_focus=True)
-        workbook.save(filename)
+        try:
+            workbook = xl.Book()
+            workbook.activate(steal_focus=True)
+            workbook.save(filename)
+        except Exception as e:
+            print("\nExcel not installed or file already opened or file cannot be created...")
+            exit()
+
         print("Excel file : {} created...".format(filename))
         return workbook
 
@@ -44,9 +52,13 @@ class intern_test:
         columns = ['              Date/Time', "City Name", "Temp", "Option C/F", 'Update Temperature(0/1)', check]
         sh1.range('A1').value = columns
         sh1.autofit('c')
-        sh2 = workbook.sheets.add(name="Sheet2", after=sh1)
-        # sh2.range('A1').value = ["City Name"]
-        self.write_citynames(workbook)
+        try:
+            sh2 = workbook.sheets.add(name="Sheet2", after='Sheet1')
+            # sh2.range('A1').value = ["City Name"]
+            self.write_citynames(workbook)
+        except:
+            print("Excel instance of the file already open. Close and re-run the program...")
+            exit()
         print("Workbook initialized...")
 
     def append_data(self, data, workbook):
@@ -93,9 +105,11 @@ class intern_test:
             # print(option)
         if option == 1:
             self.check_update_flag = 1
+            print("Updating...")
             # print(self.flag)
         if option == 0:
             self.check_update_flag = 0
+            print('Not Updating...')
             # print(self.flag)
 
     def write_citynames(self, workbook):
@@ -118,6 +132,7 @@ class intern_test:
             # print(option)
         if option == 2:
             self.exit_code = 1
+            workbook.save()
             # print(self.exit_code)
 
     def status_check(self, workbook):
