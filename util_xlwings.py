@@ -10,7 +10,8 @@ import time
 class intern_test:
     api_key = "7cac41f62c2d8231a68bbf5697ffea5a"
 
-    check_update_flag = 0
+    check_update_flag = 1
+    exit_code = 0
 
     def __init__(self, city_name='Indore', unit_system='metric'):
         self.city_name = city_name
@@ -27,7 +28,7 @@ class intern_test:
         xl.Interactive = True
         xl.Visible = True
         workbook = xl.Book()
-        workbook.activate(steal_focus=False)
+        workbook.activate(steal_focus=True)
         workbook.save(filename)
         print("Excel file : {} created...".format(filename))
         return workbook
@@ -38,8 +39,9 @@ class intern_test:
 
     def initialize_workbook(self, workbook):
         sh1 = workbook.sheets("Sheet1")
-        check = 'Note: Enter temperature option in cell "D2" and for stopping, in cell "E2" and press Enter Key'
-        columns = ['              Date/Time', "City Name", "Temp", "Option C/F", 'Option to Stop Updating(0/1)', check]
+        check = 'Note: Enter temperature option in cell "D2" and for stopping, in cell "E2" and ' \
+                'press Enter Key and enter 2 to exit the program'
+        columns = ['              Date/Time', "City Name", "Temp", "Option C/F", 'Update Temperature(0/1)', check]
         sh1.range('A1').value = columns
         sh1.autofit('c')
         sh2 = workbook.sheets.add(name="Sheet2", after=sh1)
@@ -98,7 +100,7 @@ class intern_test:
 
     def write_citynames(self, workbook):
         sh2 = workbook.sheets['Sheet2']
-        with open('city.list.json', encoding='utf8') as fp:
+        with open('city_list.json', encoding='utf8') as fp:
             c = json.load(fp)
 
             df = pd.DataFrame(c)
@@ -106,3 +108,18 @@ class intern_test:
             sh2.range("A1").options(index=False, headers=False).value = df['City Name']
             sh2.autofit('c')
         time.sleep(1.5)
+
+    def check_exit_code(self, workbook):
+        sh1 = workbook.sheets['Sheet1']
+        option = ''
+
+        if sh1.range('E2').value is not None:
+            option = int(sh1.range('E2').value)
+            # print(option)
+        if option == 2:
+            self.exit_code = 1
+            # print(self.exit_code)
+
+    def status_check(self, workbook):
+        self.to_stop_updating(workbook)
+        self.check_exit_code(workbook)

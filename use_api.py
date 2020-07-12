@@ -11,22 +11,26 @@ def start_the_program():
 
     print()
 
-    while not test_result.check_update_flag:
-        r = test_result.request_data()
-        time.sleep(0.2)
+    while not test_result.exit_code:
+        while test_result.check_update_flag or test_result.exit_code:
+            r = test_result.request_data()
+            time.sleep(0.3)
 
-        test_result.append_data(r, workbook)
-        time.sleep(0.2)
+            test_result.append_data(r, workbook)
+            time.sleep(0.3)
 
-        test_result.save_file(workbook, 'test.xlsx')
-        time.sleep(0.2)
+            test_result.save_file(workbook, 'test.xlsx')
+            time.sleep(0.3)
 
-        test_result.is_temperature_C_or_F(workbook)
-        time.sleep(0.2)
+            test_result.is_temperature_C_or_F(workbook)
+            time.sleep(0.3)
 
-        test_result.to_stop_updating(workbook)
-        time.sleep(0.2)
-        print()
+            test_result.status_check(workbook)
+            time.sleep(1)
+            print()
+
+        test_result.status_check(workbook)
+        time.sleep(2)
 
 
 if __name__ == '__main__':
