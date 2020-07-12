@@ -68,7 +68,7 @@ class intern_test:
         workbook.save()
         print("Workbook saved as {}...".format(name))
 
-    def is_C_or_F(self, workbook):
+    def is_temperature_C_or_F(self, workbook):
         sh1 = workbook.sheets['Sheet1']
         option = ''
 

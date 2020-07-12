@@ -21,9 +21,9 @@ def start_the_program():
         test_result.save_file(workbook, 'test.xlsx')
         time.sleep(0.2)
 
-        test_result.is_C_or_F(workbook)
+        test_result.is_temperature_C_or_F(workbook)
         time.sleep(0.2)
-        
+
         test_result.to_stop_updating(workbook)
         time.sleep(0.2)
         print()
