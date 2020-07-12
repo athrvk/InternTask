@@ -36,7 +36,7 @@ class intern_test:
 
     def initialize_workbook(self, workbook):
         sh1 = workbook.sheets("Sheet1")
-        check = 'Note: Enter temperature option in cell "D@2" and for stopping in cell "E2"'
+        check = 'Note: Enter temperature option in cell "D2" and for stopping in cell "E2"'
         columns = ['              Date/Time', "City Name", "Temp", "Option C/F", 'Option to End(0/1)', check]
         sh1.range('A1').value = columns
         sh1.autofit('c')
