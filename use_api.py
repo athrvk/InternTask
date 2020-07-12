@@ -4,26 +4,30 @@ import time
 test_result = intern_test()
 
 
-def run():
+def start_the_program():
     test_result.create_xlfile('test.xlsx')
-    wb = test_result.load_xlfile('test.xlsx')
-    test_result.initialize_workbook(wb)
+    workbook = test_result.load_xlfile('test.xlsx')
+    test_result.initialize_workbook(workbook)
 
     print()
 
-    while test_result.flag:
-        r = test_result.req_data()
+    while not test_result.check_update_flag:
+        r = test_result.request_data()
         time.sleep(0.2)
-        test_result.append_data(r, wb)
+
+        test_result.append_data(r, workbook)
         time.sleep(0.2)
-        test_result.save_file(wb, 'test.xlsx')
+
+        test_result.save_file(workbook, 'test.xlsx')
         time.sleep(0.2)
-        test_result.check_temp(wb)
+
+        test_result.is_C_or_F(workbook)
         time.sleep(0.2)
-        test_result.check_state(wb)
+        
+        test_result.to_stop_updating(workbook)
         time.sleep(0.2)
         print()
 
 
 if __name__ == '__main__':
-    run()
+    start_the_program()
