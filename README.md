@@ -8,7 +8,7 @@ all the necessary files are uploaded
 
 you can use the following command to set up the environment
 
-`conda env create --file environment.yaml`
+`conda env create --file environment.yml`
 
 then run the use_api.py file
 
