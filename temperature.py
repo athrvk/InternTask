@@ -19,7 +19,7 @@ class Temperature:
                 print('Wrong City Name: Enter valid city name refer Sheet 2...')
                 exit()
         except Exception as e:
-            print(api_return_value, e, "\n Cannot Request Data...\n")
+            print(e, "\nCannot Request Data...\n")
             exit()
 
         api_return_value_json = api_return_value.json()
