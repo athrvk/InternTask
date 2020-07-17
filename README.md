@@ -19,7 +19,7 @@ This project uses a live weather api and updates the temperature of user given c
 
 > The program works under Windows only(tested in Windows 10, conda environment, PyCharm IDE) and requires Microsoft Excel to be installed on the system.
 
-all the necessary files are uploaded
+
 
 The program uses 'xlwings' to handle the excel instance
 
