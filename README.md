@@ -14,7 +14,7 @@ This project uses a live weather api and updates the temperature of user given c
 
 -> xlwings library does not have event listners, so handling input events is hardcoded
 
--> No multi-threading support. Excel freezes* if the program read/writes while the user also enters the value in a cell
+-> Excel freezes* if the program read/writes while the user also enters the value in a cell
 
 *(for random period, on average 3 seconds; but restores itself back and continues to run without any error)
 
