@@ -2,7 +2,11 @@ import json
 import pandas as pd
 import time
 import xlwings as xl
+from city import *
 
+# Constants
+F = 'f'
+C = 'c'
 IMPERIAL = 'imperial'
 METRIC = 'metric'
 update_true = 1
@@ -35,7 +39,6 @@ def write_citynames(document):
 def initialize_document(document, cities):
     try:
         sh2 = document.get_workbook().sheets.add(name="Sheet2", after='Sheet1')
-        # sh2.range('A1').value = ["City Name"]
         write_citynames(document)
         print("City Names added in Sheet2...")
         time.sleep(0.1)
@@ -63,6 +66,7 @@ def initialize_document(document, cities):
 def update_temperature(document, cities):
     sh1 = document.get_workbook().sheets("Sheet1")
     for city in cities:
+        time.sleep(0.1)
         city_index = str(city.get_city_index() + 1)
         if city.temperature.keep_updating:
             current_time = time.ctime()
@@ -84,20 +88,28 @@ def read_values_from_document(document, cities):
     time.sleep(0.5)
     for city in cities:
         city_index = str(city.get_city_index() + 1)
-
-        time.sleep(0.1)
-
         city.temperature.set_unit_system(
             set_metric_system(get_celld_value(city_index, sh1),
                               city_index)
         )
-
+        time.sleep(0.1)
         city.temperature.set_update_flag(
             validate_update_flag(get_celle_value(city_index, sh1),
                                  city_index)
         )
     time.sleep(0.1)
     check_exit_flag(document, sh1)
+
+    check_new_city(cities, sh1)
+
+
+def check_new_city(cities, sh1):
+    next_empty_cell = len(cities) + 2
+    # print('A' + str(next_empty_cell))
+    if sh1.range('A' + str(next_empty_cell)).value is not None:
+        print(sh1.range('A' + str(next_empty_cell)).value)
+        cities.append(City(sh1.range('A' + str(next_empty_cell)).value, next_empty_cell - 1))
+        time.sleep(6)
 
 
 def check_exit_flag(document, sh1):
@@ -109,8 +121,7 @@ def check_exit_flag(document, sh1):
 
 
 def get_celle_value(city_index, sh1):
-    cell_e = sh1.range('E' + city_index).value
-    return cell_e
+    return sh1.range('E' + city_index).value
 
 
 def get_celld_value(city_index, sh1):
@@ -133,7 +144,7 @@ def is_valid_flag(cell_e):
 
 
 def set_metric_system(cell_d, city_index):
-    if not (cell_d == 'c' or cell_d == 'f'):
+    if not (cell_d == C or cell_d == F):
         print("Invalid Entry(cell D{}): Enter either 'C' or 'F'\n"
               "Restart the program".format(city_index))
         exit()

@@ -15,11 +15,12 @@ class Temperature:
         url = "http://api.openweathermap.org/data/2.5/weather?q={}&units={}&appid={}"
         try:
             api_return_value = requests.get(url.format(self.__city, self.__unit_system, api_key))
+            if api_return_value.json()['cod'] == '404':
+                print('Wrong City Name: Enter valid city name refer Sheet 2...')
+                exit()
         except Exception as e:
             print(api_return_value, e, "\n Cannot Request Data...\n")
             exit()
-
-        # print("Data request for {} complete...".format(self.city))
 
         api_return_value_json = api_return_value.json()
         self.__temperature = api_return_value_json['main']['temp']

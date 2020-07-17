@@ -2,13 +2,8 @@ from document import *
 from city import *
 
 document = Document(filename="weather.xlsx")
-indore = City("Indore", 1)
-bhopal = City("Bhopal", 2)
-noida = City('Noida', 3)
-mumbai = City('Mumbai', 4)
-delhi = City('Delhi', 5)
 
-cities = [indore, bhopal, noida, mumbai, delhi]
+cities = [City("Indore", 1), City("Bhopal", 2), City('Noida', 3), City('Mumbai', 4), City('Delhi', 5)]
 
 
 def start_the_program():
