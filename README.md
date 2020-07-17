@@ -4,7 +4,9 @@ This project uses a live weather api and updates the temperature of user given c
 
 ## Features
 -> Based on the concept of Object Oriented Programing
+
 -> New cities can be added dynamically by entering it in the next empty cell in column A 
+
 -> Error handling for invalid inputs(with proper error message), multiple instance of excel
 
 ## Limitations
