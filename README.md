@@ -3,7 +3,7 @@
 This project uses a live weather api and updates the temperature of user given city at a regular interval. 
 
 ## Features
--> Based on the concept of Object Oriented Programing
+-> Implemented on the concept of Object Oriented Programing (Classes, Objects)
 
 -> New cities can be added dynamically by entering it in the next empty cell in column A 
 
@@ -12,9 +12,9 @@ This project uses a live weather api and updates the temperature of user given c
 ## Limitations
 -> A city cannot be removed once entered in the cell
 
--> No multi-threading support. Excel freezes* if the program read/writes while the user also enters the value
+-> No multi-threading support. Excel freezes* if the program read/writes while the user also enters the value in a cell
 
-*(for random period, on average 5 seconds; but restores itself back and continues to run without any error)
+*(for random period, on average 3 seconds; but restores itself back and continues to run without any error)
 
 
 > The program works under Windows only(tested in Windows 10, conda environment, PyCharm IDE) and requires Microsoft Excel to be installed on the system.
