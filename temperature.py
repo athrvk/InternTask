@@ -32,9 +32,9 @@ class Temperature:
         self.__unit_system = value
 
     def is_temperature_c_or_f(self):
-        if self.__unit_system is 'metric':
+        if self.__unit_system == 'metric':
             return 'C'
-        if self.__unit_system is 'imperial':
+        if self.__unit_system == 'imperial':
             return 'F'
 
     def set_update_flag(self, value):
