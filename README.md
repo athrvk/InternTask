@@ -1,4 +1,4 @@
-# InternTask
+# Realtime Weather Update in Excel
 
 This project uses a live weather api and updates the temperature of user given city at a regular interval. 
 
