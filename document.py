@@ -3,6 +3,8 @@ import pandas as pd
 import time
 import xlwings as xl
 from city import *
+import threading
+import _thread
 
 # Constants
 F = 'f'
@@ -57,30 +59,94 @@ def initialize_document(document, cities):
     for city in cities:
         city_index = str(city.get_city_index() + 1)
         sh1.range('A' + city_index).value = city.get_cityname()
-        sh1.range('D' + city_index).value = city.temperature.is_temperature_c_or_f()
-        sh1.range('E' + city_index).value = city.temperature.keep_updating
+        sh1.range('D' + city_index).value = [city.temperature.is_temperature_c_or_f(), city.temperature.keep_updating]
 
     print("Workbook initialized...")
+
+threadLock = threading.Lock()
+def update_temperature_threaded(cities):
+    sh1 = xl.Book('weather.xlsx').sheets['Sheet1']
+    while True:
+        print("Updating")
+        for city in cities:
+            city_index = str(city.get_city_index() + 1)
+            threadLock.acquire()
+            if city.temperature.keep_updating:
+                sh1.range("B" + city_index).value = [time.ctime(), '']
+                time.sleep(0.2)
+
+                sh1.range('C' + city_index).color = (0, 255, 0)
+                sh1.range("C" + city_index).value = city.get_temperature()
+                print("Temperature updated for {}...".format(city.get_cityname()))
+            else:
+                sh1.range('C' + city_index).color = (128, 128, 128)
+                print("Temperature not updated for {}...".format(city.get_cityname()))
+            threadLock.release()
 
 
 def update_temperature(document, cities):
     sh1 = document.get_workbook().sheets("Sheet1")
     for city in cities:
-        time.sleep(0.1)
         city_index = str(city.get_city_index() + 1)
         if city.temperature.keep_updating:
-            current_time = time.ctime()
-            temperature = city.get_temperature()
-
-            sh1.range("B" + city_index).value = [current_time, '']
-            time.sleep(0.25)
+            sh1.range("B" + city_index).value = [time.ctime(), '']
+            time.sleep(0.2)
 
             sh1.range('C' + city_index).color = (0, 255, 0)
-            sh1.range("C" + city_index).value = temperature
+            sh1.range("C" + city_index).value = city.get_temperature()
             print("Temperature updated for {}...".format(city.get_cityname()))
         else:
             sh1.range('C' + city_index).color = (128, 128, 128)
             print("Temperature not updated for {}...".format(city.get_cityname()))
+
+
+def read_values_threaded(cities):
+    sh1 = xl.Book('weather.xlsx').sheets['Sheet1']
+    time.sleep(0.1)
+    while True:
+        threadLock.acquire()
+        print("Reading")
+        input_values = sh1.range('D2:E{}'.format(len(cities) + 1)).value
+
+        for unit_system, update_flag in input_values:
+            if not ((unit_system.lower() != 'c') ^ (unit_system.lower() != 'f')):
+                print('Invalid Entry: Enter either C or F')
+                raise ValueError()
+            if not ((update_flag != 1) ^ (update_flag != 0)):
+                print('Invalid Entry: Enter either 0 or 1')
+                raise ValueError()
+
+        for index in range(len(cities)):
+            cities[index].temperature.set_update_flag(input_values[index][1])
+            cities[index].temperature.set_unit_system(conversion(input_values[index][0].lower()))
+
+        threadLock.release()
+        check_exit_flag(xl.Book('weather.xlsx'), sh1)
+        check_new_city(cities, sh1)
+        # time.sleep(2)
+
+
+def read_values_from_document_v2(document, cities):
+    sh1 = document.get_workbook().sheets("Sheet1")
+    time.sleep(0.5)
+
+    input_values = sh1.range('D2:E{}'.format(len(cities) + 1)).value
+
+    for unit_system, update_flag in input_values:
+        if not ((unit_system.lower() != 'c') ^ (unit_system.lower() != 'f')):
+            print('Invalid Entry: Enter either C or F')
+            raise ValueError()
+        if not ((update_flag != 1) ^ (update_flag != 0)):
+            print('Invalid Entry: Enter either 0 or 1')
+            raise ValueError()
+
+    for index in range(len(cities)):
+        cities[index].temperature.set_update_flag(input_values[index][1])
+        cities[index].temperature.set_unit_system(conversion(input_values[index][0].lower()))
+
+    check_exit_flag(document, sh1)
+
+    check_new_city(cities, sh1)
 
 
 def read_values_from_document(document, cities):
@@ -92,12 +158,12 @@ def read_values_from_document(document, cities):
             set_metric_system(get_celld_value(city_index, sh1),
                               city_index)
         )
-        time.sleep(0.1)
+        # time.sleep(0.1)
         city.temperature.set_update_flag(
             validate_update_flag(get_celle_value(city_index, sh1),
                                  city_index)
         )
-    time.sleep(0.1)
+    # time.sleep(0.1)
     check_exit_flag(document, sh1)
 
     check_new_city(cities, sh1)
@@ -105,19 +171,23 @@ def read_values_from_document(document, cities):
 
 def check_new_city(cities, sh1):
     next_empty_cell = len(cities) + 2
-    # print('A' + str(next_empty_cell))
-    if sh1.range('A' + str(next_empty_cell)).value is not None:
-        print(sh1.range('A' + str(next_empty_cell)).value)
-        cities.append(City(sh1.range('A' + str(next_empty_cell)).value, next_empty_cell - 1))
-        time.sleep(6)
+    cell_value = sh1.range('A' + str(next_empty_cell)).value
+    if cell_value is not None:
+        print(cell_value)
+        new_city = City(cell_value, next_empty_cell - 1)
+        cities.append(new_city)
+        sh1.range('D' + str(next_empty_cell)).value = ['C', 1]
 
 
 def check_exit_flag(document, sh1):
     exit_flag = sh1.range('F2').value
     if exit_flag is not None and exit_flag == 2:
         print("Exiting program...")
-        document.save_file()
-        exit()
+        document.save()
+        # document.save_file()
+        # exit()
+        _thread.interrupt_main()
+    return True
 
 
 def get_celle_value(city_index, sh1):
